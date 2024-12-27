@@ -8,7 +8,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { jsPDF } from "jspdf";
-import Navbar from "../Components/Navber";
+import Navbar from "../Components/Navbar";
 import RegisterMemberModal from "../Components/RegisterMemberModal";
 import * as htmlToImage from "html-to-image";
 import image from "../assets/qr.png";

@@ -22,7 +22,7 @@ const Navbar = () => {
   const menuItems = [
     { label: "Home", icon: <HomeOutlined />, link: "/" },
     { label: "Members", icon: <UserOutlined />, link: "/members" },
-    { label: "Conference", icon: <FormOutlined />, link: "/conference" },
+    { label: "Meetings", icon: <FormOutlined />, link: "/meetings" },
     { label: "Payment", icon: <MoneyCollectOutlined />, link: "/payment" },
     { label: "Logout", icon: <LogoutOutlined />, link: "/logout" },
   ];

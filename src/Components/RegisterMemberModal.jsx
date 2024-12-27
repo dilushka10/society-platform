@@ -42,7 +42,7 @@ const RegisterMemberModal = ({ visible, onCancel, onSubmit }) => {
         onFinish={handleFinish}
         className="space-y-4"
       >
-        {/* Image Placeholder */}
+        
         <div className="flex justify-center mb-4 md:mb-6">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
@@ -71,15 +71,21 @@ const RegisterMemberModal = ({ visible, onCancel, onSubmit }) => {
 
         {/* Registered Date */}
         <Form.Item
-  name="registeredDate" // Must match the key used in handleSubmit
-  label={<span className="font-medium text-black text-sm md:text-base">Registered Date</span>}
-  rules={[{ required: true, message: "Please enter the registered date!" }]}
->
-  <Input
-    type="date"
-    className="rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-  />
-</Form.Item>
+          name="date" 
+          label={
+            <span className="font-medium text-black text-sm md:text-base">
+              Registered Date
+            </span>
+          }
+          rules={[
+            { required: true, message: "Please enter the registered date!" },
+          ]}
+        >
+          <Input
+            type="date"
+            className="rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </Form.Item>
 
         {/* Name */}
         <Form.Item
@@ -131,22 +137,25 @@ const RegisterMemberModal = ({ visible, onCancel, onSubmit }) => {
 
         {/* Phone Number */}
         <Form.Item
-  name="phoneNumber" // Must match the key used in handleSubmit
-  label={<span className="font-medium text-black text-sm md:text-base">Phone Number</span>}
-  rules={[
-    { required: true, message: "Please enter the phone number!" },
-    {
-      pattern: /^[0-9]{10}$/,
-      message: "Please enter a valid 10-digit phone number!",
-    },
-  ]}
->
-  <Input
-    placeholder="Enter Phone Number"
-    className="rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-  />
-</Form.Item>
-
+          name="phoneNumber"
+          label={
+            <span className="font-medium text-black text-sm md:text-base">
+              Phone Number
+            </span>
+          }
+          rules={[
+            { required: true, message: "Please enter the phone number!" },
+            {
+              pattern: /^[0-9]{10}$/,
+              message: "Please enter a valid 10-digit phone number!",
+            },
+          ]}
+        >
+          <Input
+            placeholder="Enter Phone Number"
+            className="rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </Form.Item>
 
         {/* Submit Button */}
         <Form.Item>

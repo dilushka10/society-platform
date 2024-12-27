@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Dropdown, Menu, Button, Table, Input, Modal } from "antd";
+import { Dropdown, Menu, Button, Table, Input, Modal, message } from "antd";
 import {
   EllipsisOutlined,
   EyeOutlined,
@@ -7,34 +7,36 @@ import {
   DeleteOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
+import { jsPDF } from "jspdf";
 import Navbar from "../Components/Navber";
 import RegisterMemberModal from "../Components/RegisterMemberModal";
 import * as htmlToImage from "html-to-image";
-import image from'../assets/qr.png'
+import image from "../assets/qr.png";
+import EditMemberModel from "../Components/EditMemberModel";
 
 const Members = () => {
   const data = [
     {
       key: "1",
-      membershipNo: "00545",
+      membershipNo: "005451",
       date: "2024-12-26",
-      name: "John Doe",
-      society: "Kaluthara",
-      societyregistrationnumber: "SRN0025",
-      address: "123 Main St, Colombo",
-      nic: "982374567V",
-      phonenumber: "0775555555",
+      name: "John Doe1",
+      society: "Kaluthara1",
+      societyregistrationnumber: "SRN00251",
+      address: "123 Main St, Colombo1",
+      nic: "982374567V1",
+      phonenumber: "0775555551",
     },
     {
       key: "2",
-      membershipNo: "00546",
+      membershipNo: "005462",
       date: "2024-12-25",
-      name: "Jane Doe",
-      society: "Gampaha",
-      societyregistrationnumber: "SRN0026",
-      address: "456 High St, Kandy",
-      nic: "983746528V",
-      phonenumber: "0776666666",
+      name: "Jane Doe22",
+      society: "Gampaha2",
+      societyregistrationnumber: "SRN00262",
+      address: "456 High St, Kandy2",
+      nic: "983746528V2",
+      phonenumber: "0776666662",
     },
     {
       key: "3",
@@ -66,6 +68,9 @@ const Members = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [isCardModalVisible, setIsCardModalVisible] = useState(false);
   const [membersData, setMembersData] = useState(data);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [deleteRecord, setDeleteRecord] = useState(null);
 
   const cardRef = useRef();
 
@@ -77,11 +82,32 @@ const Members = () => {
     setIsModalVisible(false);
   };
 
+  const handleEditSubmit = (updatedValues) => {
+    setMembersData((prevData) =>
+      prevData.map((member) =>
+        member.key === selectedRecord.key
+          ? {
+              ...member,
+              membershipNo: updatedValues.membershipNo,
+              date: updatedValues.registeredDate,
+              name: updatedValues.name,
+              address: updatedValues.address,
+              nic: updatedValues.nic,
+              phonenumber: updatedValues.phoneNumber,
+            }
+          : member
+      )
+    );
+    setIsEditModalVisible(false);
+    setSelectedRecord(null);
+    message.success("Member details updated successfully!", 3);
+  };
+
   const handleSubmit = (values) => {
     const newMember = {
       key: membersData.length + 1,
       membershipNo: values.membershipNo,
-      date: values.registeredDate,
+      date: values.date,
       name: values.name,
       address: values.address,
       nic: values.nic,
@@ -93,144 +119,115 @@ const Members = () => {
     setIsModalVisible(false);
   };
 
-  // Open the card modal
+  // Open card
   const handleMenuClick = (action, record) => {
-    if (action === "Edit") {
-      setSelectedRecord(record);
-      setIsModalVisible(true);
-    } else if (action === "Delete") {
-      setMembersData(membersData.filter((member) => member.key !== record.key));
-    } else if (action === "View") {
+    if (action === "View") {
       setSelectedRecord(record);
       setIsCardModalVisible(true);
     }
-  };
-
-  // Close the card modal
-  const closeModal = () => {
-    setIsCardModalVisible(false);
-  };
-
-  const handlePrint = () => {
-    if (!cardRef.current) return;
-
-    const printableContent = `
-      <div class="id-card">
-        <div class="id-header">
-          <h1>${selectedRecord.name}</h1>
-        </div>
-        <div class="id-body">
-          <div class="qr-code">
-            <img
-              src="./qr.png"
-              alt="QR Code"
-            />
-          </div>
-          <div class="details">
-            <p class="society">${selectedRecord.society}</p>
-            <p>Reg. No: ${selectedRecord.societyregistrationnumber}</p>
-            <p>Membership No: ${selectedRecord.membershipNo}</p>
-            <p>Phone: ${selectedRecord.phonenumber}</p>
-          </div>
-        </div>
-      </div>
-    `;
-
-    const printStyles = `
-      <style>
-        @media print {
-          * {
-            -webkit-print-color-adjust: exact; /* For WebKit browsers */
-            color-adjust: exact; /* For modern browsers */
-          }
-        }
-        body {
-          font-family: 'Arial', sans-serif;
-          margin: 0;
-          padding: 0;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background-color: #ffffff;
-          height: 100vh;
-        }
-        .id-card {
-          width: 250px;
-          height: 400px;
-          background-color: #ffffff;
-          border-radius: 8px;
-      
-          text-align: center;
-          overflow: hidden;
-          border: 1px solid #e0e0e0;
-          padding: 10px;
-        }
-        .id-header {
-          color: black;
-          padding: 15px 0;
-          font-size: 10px;
-          font-weight: bold;
-          border-radius: 8px;
-        }
-        .id-body {
-          padding: 10px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 15px;
-        }
-        .qr-code img {
-          width: 120px;
-          height: 120px;
-          border: 2px solid #ddd;
-          padding: 5px;
-          border-radius: 5px;
-        }
-        .details {
-          padding: 10px;
-          width: 100%;
-          text-align: center;
-        
-        }
-        .details p {
-          font-size: 16px;
-          margin: 4px 0;
-          color: #333;
-        }
-        .details .society {
-          font-weight: bold;
-          color: #1565c0;
-        }
-      </style>
-    `;
-
-    const printWindow = window.open("", "_blank");
-    if (printWindow) {
-      printWindow.document.open();
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Print Name Tag</title>
-            ${printStyles}
-          </head>
-          <body>
-            ${printableContent}
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
-      printWindow.close();
+    if (action === "Edit") {
+      setSelectedRecord(record);
+      setIsEditModalVisible(true);
+    }
+    if (action === "Delete") {
+      setDeleteRecord(record);
+      setIsDeleteModalVisible(true);
     }
   };
 
-  const handleDownload = async () => {
-    if (cardRef.current) {
-      const dataUrl = await htmlToImage.toPng(cardRef.current);
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `${selectedRecord?.name}_ID_Card.png`;
-      link.click();
+  const handleDeleteMember = () => {
+    setMembersData((prevData) =>
+      prevData.filter((member) => member.key !== deleteRecord.key)
+    );
+    message.success("Member deleted successfully!");
+    setIsDeleteModalVisible(false);
+    setDeleteRecord(null);
+  };
+
+  // Close card
+  const closeModal = () => {
+    setIsCardModalVisible(false);
+    setSelectedRecord(null);
+  };
+
+  const handleShare = async () => {
+    if (!cardRef.current || !selectedRecord) {
+      message.error("Card content not found.");
+      return;
+    }
+
+    try {
+      // Convert card to an image
+      const dataUrl = await htmlToImage.toPng(cardRef.current, {
+        pixelRatio: 2,
+      });
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [300, 400],
+      });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+      const pdfBlob = await pdf.output("blob");
+      const file = new File([pdfBlob], `${selectedRecord.name}_ID_Card.pdf`, {
+        type: "application/pdf",
+      });
+
+      // Check if sharing is supported
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: `${selectedRecord.name}'s ID Card`,
+          text: `Here is the ID card for ${selectedRecord.name}.`,
+          files: [file],
+        });
+        message.success("PDF shared successfully.");
+      } else {
+        message.warning("Web Share API not supported. Downloading the PDF...");
+        pdf.save(`${selectedRecord.name}_ID_Card.pdf`);
+      }
+    } catch (error) {
+      console.error("Error sharing PDF:", error);
+      message.error("Failed to share PDF. Check console for details.");
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!cardRef.current) {
+      message.error("Card content not found.");
+      return;
+    }
+
+    try {
+      // Convert card content to an image
+      const dataUrl = await htmlToImage.toPng(cardRef.current, {
+        pixelRatio: 2, // Increase quality of the image
+      });
+
+      // Create a new jsPDF instance
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [300, 400],
+      });
+
+      // Get dimensions of the PDF page
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // Add image to PDF
+      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+      // Save the PDF with the member's name
+      pdf.save(`${selectedRecord.name}_ID_Card.pdf`);
+      message.success("PDF downloaded successfully.");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      message.error("Failed to generate PDF. Check console for details.");
     }
   };
 
@@ -309,10 +306,10 @@ const Members = () => {
 
   useEffect(() => {
     filterData();
-  }, [searchText]);
+  }, [searchText, membersData]);
 
   const filterData = () => {
-    const filtered = data.filter(
+    const filtered = membersData.filter(
       (item) =>
         item.name.toLowerCase().includes(searchText.toLowerCase()) ||
         item.membershipNo.includes(searchText)
@@ -322,6 +319,7 @@ const Members = () => {
 
   const clearField = () => {
     setSearchText("");
+    setFilteredData(membersData);
   };
 
   return (
@@ -361,7 +359,7 @@ const Members = () => {
             <div className="hidden md:block">
               <Table
                 columns={columns}
-                dataSource={membersData}
+                dataSource={filteredData}
                 pagination={{ pageSize: 5 }}
                 bordered
                 rowClassName={(record, index) =>
@@ -381,7 +379,7 @@ const Members = () => {
                   <div className="flex justify-between items-center  border-b pb-2 mb-4">
                     <h3 className="text-lg font-semibold">{record.name}</h3>
                     <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-lg">
-                      #{record.membershipNo}
+                      {record.membershipNo}
                     </span>
                   </div>
                   <div className="space-y-2">
@@ -431,103 +429,121 @@ const Members = () => {
       </div>
       {/* Card Modal */}
       <Modal
-  visible={isCardModalVisible}
-  onCancel={closeModal}
-  footer={null}
-  centered
->
-  {selectedRecord && (
-    <div
-      id="printableArea"
-      ref={cardRef}
-      className="relative w-64 h-96 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-lg shadow-xl border border-purple-500 p-4 mx-auto flex flex-col items-center overflow-hidden"
-    >
+        visible={isCardModalVisible}
+        onCancel={closeModal}
+        footer={null}
+        centered
+      >
+        {selectedRecord && (
+          <div
+            ref={cardRef}
+            className="relative w-64 h-96 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-lg shadow-xl border border-purple-500 p-4 mx-auto flex flex-col items-center overflow-hidden"
+          >
+            <div className="relative w-full h-screen bg-gray-900">
+              {/* Background Layer */}
+              <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900"></div>
+            </div>
 
+            {/* Header */}
+            <div className="relative text-xl font-bold uppercase mb-2 mt-5 tracking-wide text-center z-10">
+              {selectedRecord.name}
+            </div>
 
+            {/* Sub-header */}
+            <div className="relative text-sm italic mb-4 z-10">
+              Member of {selectedRecord.society}
+            </div>
 
+            {/* Body */}
+            <div className="relative flex flex-col items-center z-10">
+              {/* QR Code */}
+              <div className="w-32 h-32 border-2 border-white rounded-md p-2 mt-4 mb-6 bg-white">
+                <img
+                  src={image} 
+                  alt="QR Code"
+                  className="w-full h-full object-contain"
+                />
+              </div>
 
+              {/* Details */}
+              <div className="text-center text-sm">
+                <p className="font-semibold text-yellow-300 mb-1">
+                  Socissety: {selectedRecord.society}
+                </p>
+                <p className="text-gray-100 mb-1">
+                  Reg. No: {selectedRecord.societyregistrationnumber}
+                </p>
+                <p className="text-gray-100 mb-1">
+                  Membership No: {selectedRecord.membershipNo}
+                </p>
+                <p className="text-gray-100">
+                  Phone: {selectedRecord.phonenumber}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
-<div className="relative w-full h-screen bg-gray-900">
-  {/* Background Layer */}
-  <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900"></div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-      {/* Header */}
-      <div className="relative text-xl font-bold uppercase mb-2 mt-5 tracking-wide text-center z-10">
-        {selectedRecord.name}
-      </div>
-
-      {/* Sub-header */}
-      <div className="relative text-sm italic mb-4 z-10">
-        Member of {selectedRecord.society}
-      </div>
-
-      {/* Body */}
-      <div className="relative flex flex-col items-center z-10">
-        {/* QR Code */}
-        <div className="w-32 h-32 border-2 border-white rounded-md p-2 mt-4 mb-6 bg-white">
-          <img
-            src={image} // Replace with the actual QR image source
-            alt="QR Code"
-            className="w-full h-full object-contain"
-          />
+        {/* Action Buttons */}
+        <div className="flex justify-between mt-4">
+          <Button
+            onClick={handleDownloadPDF}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Download PDF
+          </Button>
+          <Button
+            onClick={handleShare}
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+          >
+            Share
+          </Button>
         </div>
+      </Modal>
 
-        {/* Details */}
-        <div className="text-center text-sm">
-          <p className="font-semibold text-yellow-300 mb-1">
-            Society: {selectedRecord.society}
-          </p>
-          <p className="text-gray-100 mb-1">
-            Reg. No: {selectedRecord.societyregistrationnumber}
-          </p>
-          <p className="text-gray-100 mb-1">
-            Membership No: {selectedRecord.membershipNo}
-          </p>
-          <p className="text-gray-100">
-            Phone: {selectedRecord.phonenumber}
-          </p>
-        </div>
-      </div>
-    </div>
-  )}
-
-  {/* Action Buttons */}
-  <div className="flex justify-between mt-4">
-    <Button
-      onClick={handlePrint}
-      className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-    >
-      Print
-    </Button>
-    <Button
-      onClick={handleDownload}
-      className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-    >
-      Download
-    </Button>
-  </div>
-</Modal>
-
-
-
-
+      {/* Edit Member Modal */}
+      <EditMemberModel
+        visible={isEditModalVisible}
+        onCancel={() => setIsEditModalVisible(false)}
+        onSubmit={handleEditSubmit}
+        initialData={selectedRecord}
+      />
 
       <RegisterMemberModal
         visible={isModalVisible}
         onCancel={handleCancel}
         onSubmit={handleSubmit}
       />
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        visible={isDeleteModalVisible}
+        footer={null}
+        onCancel={() => setIsDeleteModalVisible(false)}
+        centered
+        width={400}
+      >
+        <div className="text-center">
+          <div className="bg-red-100 rounded-full w-20 h-20 mx-auto flex items-center justify-center">
+            <DeleteOutlined className="text-red-500 text-3xl" />
+          </div>
+          <h2 className="text-red-500 text-lg font-semibold mt-4">
+            Confirm Delete
+          </h2>
+          <p className="text-gray-600">
+            Are you sure you want to delete this member? This action cannot be
+            undone.
+          </p>
+          <div className="flex justify-center mt-4 space-x-4">
+            <Button onClick={() => setIsDeleteModalVisible(false)}>
+              Cancel
+            </Button>
+            <Button type="primary" danger onClick={handleDeleteMember}>
+              Delete
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

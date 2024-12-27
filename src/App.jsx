@@ -1,6 +1,6 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom"; // Import React Router components
-import Members from "./Pages/Members"; // Ensure this path is correct
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Members from "./Pages/Members";
 
 function App() {
   return (

@@ -16,6 +16,7 @@ const Navbar = () => {
 
   const toggleCollapse = () => {
     setCollapsed(!collapsed);
+    
   };
 
   const menuItems = [
@@ -31,19 +32,13 @@ const Navbar = () => {
       {/* Desktop Sidebar */}
       <aside
         className={`hidden md:flex ${
-          collapsed ? "w-10" : "w-64"
+          collapsed ? "w-16" : "w-64"
         } bg-[#0D47A1] text-white flex-col justify-between h-screen transition-all duration-300 font-custom`}
       >
         {/* Top Section */}
         <div>
-          <div className="flex items-center justify-between bg-[#0B3A91] h-16 px-4 border-b border-[#073574]">
-            <div
-              className={`${
-                collapsed ? "hidden" : "block"
-              } font-bold text-lg`}
-            >
-              LOGO
-            </div>
+          <div className="flex items-center justify-center bg-[#0B3A91] h-16  border-b border-[#073574]">
+           
             <button
               onClick={toggleCollapse}
               className="text-white hover:text-gray-300 focus:outline-none"
@@ -84,7 +79,7 @@ const Navbar = () => {
       </aside>
 
       {/* Mobile Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 w-full bg-white shadow-lg py-2 flex justify-around items-center md:hidden">
+      <div className="fixed bottom-0 left-0 w-svw bg-white shadow-lg py-2 flex justify-around items-center md:hidden z-10">
         {menuItems.map((item) => (
           <Link
             key={item.label}

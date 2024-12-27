@@ -5,9 +5,9 @@ const RegisterMemberModal = ({ visible, onCancel, onSubmit }) => {
   const [form] = Form.useForm();
 
   const handleFinish = (values) => {
-    console.log("Form Values:", values);
+    // console.log("Form Values:", values);
     form.resetFields();
-    onSubmit(values);
+    onSubmit(values); 
   };
 
   return (

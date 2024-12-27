@@ -17,122 +17,50 @@ import EditMemberModel from "../Components/EditMemberModel";
 const baseUrl = import.meta.env.VITE_SERVER_BASE_URL;
 
 const Members = () => {
-  const data = [
-    {
-      key: "1",
-      membershipNo: "005451",
-      date: "2024-12-26",
-      name: "John Doe1",
-      society: "Kaluthara1",
-      societyregistrationnumber: "SRN00251",
-      address: "123 Main St, Colombo1",
-      nic: "982374567V1",
-      phonenumber: "0775555551",
-    },
-    {
-      key: "2",
-      membershipNo: "005462",
-      date: "2024-12-25",
-      name: "Jane Doe22",
-      society: "Gampaha2",
-      societyregistrationnumber: "SRN00262",
-      address: "456 High St, Kandy2",
-      nic: "983746528V2",
-      phonenumber: "0776666662",
-    },
-    {
-      key: "3",
-      membershipNo: "00547",
-      date: "2024-12-24",
-      name: "Alex Smith",
-      society: "Ragama",
-      societyregistrationnumber: "SRN0027",
-      address: "789 Park Ave, Galle",
-      nic: "976543289V",
-      phonenumber: "0777777777",
-    },
-    {
-      key: "4",
-      membershipNo: "00548",
-      date: "2024-12-23",
-      name: "Sara Johnson",
-      society: "Colombo",
-      societyregistrationnumber: "SRN0028",
-      address: "12 Baker St, Jaffna",
-      nic: "985467382V",
-      phonenumber: "0778888888",
-    },
-  ];
+  // const [data,setData] = useState([]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [filteredData, setFilteredData] = useState(data);
+  const [filteredData, setFilteredData] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [isCardModalVisible, setIsCardModalVisible] = useState(false);
-  const [membersData, setMembersData] = useState(data);
+  const [membersData, setMembersData] = useState([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [deleteRecord, setDeleteRecord] = useState(null);
 
   const cardRef = useRef();
 
-  const [memberData,setMemberData] = useState([
-    // {
-    //   key: "1",
-    //   membershipNo: "00545",
-    //   date: "2024-12-26",
-    //   name: "John Doe",
-    //   address: "123 Main St, Colombo",
-    //   nic: "982374567V",
-    //   phonenumber: "0775555555",
-    // },
-    // {
-    //   key: "2",
-    //   membershipNo: "00546",
-    //   date: "2024-12-25",
-    //   name: "Jane Doe",
-    //   address: "456 High St, Kandy",
-    //   nic: "983746528V",
-    //   phonenumber: "0775158813",
-    // },
-  ]
-);
+  const soceityId = "123456";
 
-const soceityId = '123456';
+  useEffect(() => {
+    const getMembersData = async () => {
+      try {
+        const response = await fetch(
+          `${baseUrl}/api/v1/member/getall/${soceityId}`
+        );
+        // const response = await fetch(`https://5000-idx-society-platform-1735035301886.cluster-fu5knmr55rd44vy7k7pxk74ams.cloudworkstations.dev/api/v1/member/getall`);
+        // console.log('res',response);
 
-useEffect(()=>{
-
-  const getMembersData = async ()=>{
-
-    try {
-      
-      const response = await fetch(`${baseUrl}/api/v1/member/getall/${soceityId}`);
-      // const response = await fetch(`https://5000-idx-society-platform-1735035301886.cluster-fu5knmr55rd44vy7k7pxk74ams.cloudworkstations.dev/api/v1/member/getall`);
-      // console.log('res',response);
-
-      if(response.ok){
-        const data = await response.json()
-        console.log('data',data);
-        if(data.message ==='No members found for this society'){
-          message.info('No members found for this society');
-        }else{
-          setMemberData(data);
-        };
-
-      }else{
-        console.error(`Error: ${response.status}`);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("data", data);
+          if (data.message === "No members found for this society") {
+            message.info("No members found for this society");
+          } else {
+            setMembersData(data);
+            setFilteredData(data);
+          }
+        } else {
+          console.error(`Error: ${response.status}`);
+        }
+      } catch (error) {
+        console.error(error);
       }
+    };
 
-
-    } catch (error) {
-      console.error(error);
-    }
-
-    
-  };
-  
-  getMembersData();
-},[]);
+    getMembersData();
+  }, []);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -142,30 +70,57 @@ useEffect(()=>{
     setIsModalVisible(false);
   };
 
-  const handleEditSubmit = (updatedValues) => {
-    setMembersData((prevData) =>
-      prevData.map((member) =>
-        member.key === selectedRecord.key
-          ? {
-              ...member,
-              membershipNo: updatedValues.membershipNo,
-              date: updatedValues.registeredDate,
-              name: updatedValues.name,
-              address: updatedValues.address,
-              nic: updatedValues.nic,
-              phonenumber: updatedValues.phoneNumber,
-            }
-          : member
-      )
-    );
-    setIsEditModalVisible(false);
-    setSelectedRecord(null);
-    message.success("Member details updated successfully!", 3);
+  const handleEditSubmit = async (updatedValues) => {
+    console.log("up val", updatedValues);
+
+    if (!selectedRecord.systemId) {
+      console.error("No Members in selected record");
+      return;
+    }
+
+    const body = {
+      membershipNo: updatedValues.membershipNo,
+      date: updatedValues.date,
+      name: updatedValues.name,
+      address: updatedValues.address,
+      nicNo: updatedValues.nicNo,
+      contactNo: updatedValues.contactNo,
+    };
+
+    const memberData = JSON.stringify(body);
+    console.log("Payload Sent:", memberData);
+
+    try {
+      const response = await fetch(
+        `${baseUrl}/api/v1/member/update/${selectedRecord.systemId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: memberData,
+        }
+      );
+
+      // console.log("Response:", response);
+
+      if (response.ok) {
+        setIsEditModalVisible(false);
+        setSelectedRecord(null);
+        message.success("Member details updated successfully!", 3);
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        console.error(`Error: ${response.status}`);
+        const errorResponse = await response.text();
+        console.error("Error Details:", errorResponse);
+        message.error(errorResponse);
+      }
+    } catch (error) {
+      console.error("Request Failed:", error);
+    }
   };
 
   const handleSubmit = async (values) => {
-    console.log("Submitted Values:", values);
-  
     const body = {
       membershipNo: values.membershipNo,
       date: values.registeredDate,
@@ -173,25 +128,25 @@ useEffect(()=>{
       address: values.address,
       nicNo: values.nic,
       contactNo: values.phoneNumber,
-      societyId: '123456', // Ensure this field exists in your form values or set a default value.
+      societyId: "123456", // Ensure this field exists in your form values or set a default value.
     };
-  
+
     const memberData = JSON.stringify(body);
     // console.log("Payload Sent:", memberData);
-  
+
     try {
       const response = await fetch(`${baseUrl}/api/v1/member/add`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: memberData,
       });
- 
+
       // console.log("Response:", response);
-      
+
       if (response.ok) {
         // const data = await response.json();
         // console.log("Server Response:", data);
-        setMemberData((prevData) => [...prevData, body]);
+        setFilteredData((prevData) => [...prevData, body]);
         message.success("Member Registered Successfully");
       } else {
         console.error(`Error: ${response.status}`);
@@ -216,17 +171,41 @@ useEffect(()=>{
     }
     if (action === "Delete") {
       setDeleteRecord(record);
+      console.log("delete record", record);
       setIsDeleteModalVisible(true);
     }
   };
 
-  const handleDeleteMember = () => {
-    setMembersData((prevData) =>
-      prevData.filter((member) => member.key !== deleteRecord.key)
-    );
-    message.success("Member deleted successfully!");
-    setIsDeleteModalVisible(false);
-    setDeleteRecord(null);
+  const handleDeleteMember = async () => {
+    if (!deleteRecord.systemId) {
+      console.error("No Members in selected record");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${baseUrl}/api/v1/member/delete/${deleteRecord.systemId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        message.success("Member Deleted Successfully");
+        setIsDeleteModalVisible(false);
+        setDeleteRecord(null);
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        console.error(`Error: ${response.status}`);
+        const errorResponse = await response.text();
+        console.error("Error Details:", errorResponse);
+        message.error(errorResponse);
+      }
+    } catch (error) {
+      console.error("Request Failed:", error);
+    }
   };
 
   // Close card
@@ -394,11 +373,15 @@ useEffect(()=>{
   }, [searchText, membersData]);
 
   const filterData = () => {
+    // console.log('search txt ', searchText);
+    // console.log('Members data ', membersData);
+
     const filtered = membersData.filter(
       (item) =>
         item.name.toLowerCase().includes(searchText.toLowerCase()) ||
         item.membershipNo.includes(searchText)
     );
+    console.log("filtered", filtered);
     setFilteredData(filtered);
   };
 
@@ -522,48 +505,44 @@ useEffect(()=>{
         {selectedRecord && (
           <div
             ref={cardRef}
-            className="relative w-64 h-96 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-lg shadow-xl border border-purple-500 p-4 mx-auto flex flex-col items-center overflow-hidden"
+            className="relative w-64 h-96  text-black rounded-lg shadow-xl border border-purple-500 p-4 mx-auto flex flex-col items-center overflow-hidden"
           >
-            <div className="relative w-full h-screen bg-gray-900">
-              {/* Background Layer */}
-              <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900"></div>
-            </div>
-
             {/* Header */}
             <div className="relative text-xl font-bold uppercase mb-2 mt-5 tracking-wide text-center z-10">
               {selectedRecord.name}
             </div>
 
             {/* Sub-header */}
-            <div className="relative text-sm italic mb-4 z-10">
+            <div className="relative text-sm italic  z-10">
               Member of {selectedRecord.society}
             </div>
 
             {/* Body */}
             <div className="relative flex flex-col items-center z-10">
               {/* QR Code */}
-              <div className="w-32 h-32 border-2 border-white rounded-md p-2 mt-4 mb-6 bg-white">
+              <div className="w-full h-36 border-2 border-white rounded-md p-2 mt-4  bg-white">
                 <img
-                  src={image} 
+                  src={
+                    selectedRecord.qrCodeUrl ? selectedRecord.qrCodeUrl : image
+                  }
                   alt="QR Code"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-covered "
                 />
               </div>
 
               {/* Details */}
               <div className="text-center text-sm">
-                <p className="font-semibold text-yellow-300 mb-1">
-                  Socissety: {selectedRecord.society}
+                <p className="font-semibold text-black">
+                  Society:{" "}
+                  {selectedRecord.society ? selectedRecord.society : "Unknown"}
                 </p>
-                <p className="text-gray-100 mb-1">
-                  Reg. No: {selectedRecord.societyregistrationnumber}
+                <p className="text-black">
+                  Reg. No: {selectedRecord.societyId}
                 </p>
-                <p className="text-gray-100 mb-1">
+                <p className="text-black">
                   Membership No: {selectedRecord.membershipNo}
                 </p>
-                <p className="text-gray-100">
-                  Phone: {selectedRecord.phonenumber}
-                </p>
+                <p className="text-black">Phone: {selectedRecord.contactNo}</p>
               </div>
             </div>
           </div>

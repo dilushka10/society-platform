@@ -1,18 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal, Form, Input, Button } from "antd";
 
 const EditMemberModal = ({ visible, onCancel, onSubmit, initialData }) => {
   const [form] = Form.useForm();
+  const [QRimage,setQRimage] = useState('');
 
   React.useEffect(() => {
     if (initialData) {
+      console.log("Initial data",initialData);
+      setQRimage(initialData.qrCodeUrl)
       form.setFieldsValue({
         membershipNo: initialData.membershipNo,
-        registeredDate: initialData.date,
+        date: initialData.date,
         name: initialData.name,
         address: initialData.address,
-        nic: initialData.nic,
-        phoneNumber: initialData.phonenumber,
+        nicNo: initialData.nicNo,
+        contactNo: initialData.contactNo,
       });
     }
   }, [initialData, form]);
@@ -56,8 +59,7 @@ const EditMemberModal = ({ visible, onCancel, onSubmit, initialData }) => {
         {/* Image */}
         <div className="flex justify-center mb-4 md:mb-6">
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
-            alt="Generated Member ID"
+            src={QRimage}
             className="w-24 h-24 md:w-32 md:h-32 rounded-md shadow-md border border-black"
           />
         </div>
@@ -75,7 +77,7 @@ const EditMemberModal = ({ visible, onCancel, onSubmit, initialData }) => {
 
         {/* Registered Date */}
         <Form.Item
-          name="registeredDate"
+          name="date"
           label="Registered Date"
           rules={[
             { required: true, message: "Please enter the registered date!" },
@@ -104,7 +106,7 @@ const EditMemberModal = ({ visible, onCancel, onSubmit, initialData }) => {
 
         {/* NIC No */}
         <Form.Item
-          name="nic"
+          name="nicNo"
           label="NIC Number"
           rules={[{ required: true, message: "Please enter the NIC number!" }]}
         >
@@ -113,7 +115,7 @@ const EditMemberModal = ({ visible, onCancel, onSubmit, initialData }) => {
 
         {/* Phone Number */}
         <Form.Item
-          name="phoneNumber"
+          name="contactNo"
           label="Phone Number"
           rules={[
             { required: true, message: "Please enter the phone number!" },

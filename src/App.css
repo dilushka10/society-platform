@@ -40,3 +40,23 @@
 .read-the-docs {
   color: #888;
 }
+
+@media print {
+  body * {
+    visibility: hidden; /* Hide all elements by default */
+  }
+  #printableArea, #printableArea * {
+    visibility: visible; /* Show only the printable area */
+  }
+  #printableArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* Hide unwanted elements */
+  header, footer {
+    display: none;
+  }
+}

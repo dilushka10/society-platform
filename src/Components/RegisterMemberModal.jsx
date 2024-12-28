@@ -27,14 +27,7 @@ const RegisterMemberModal = ({ visible, onCancel, onSubmit }) => {
         maxHeight: "80vh",
         overflowY: "auto",
       }}
-      style={{
-        borderRadius: "12px",
-        maxWidth: "95%",
-        minWidth: "30%",
-        maxHeight: "90%",
-        padding: 0,
-      }}
-      className="md:max-w-lg md:min-w-[400px] mx-auto"
+     
     >
       <Form
         form={form}

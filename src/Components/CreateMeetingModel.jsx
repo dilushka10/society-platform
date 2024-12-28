@@ -13,6 +13,12 @@ const CreateMeetingModal = ({
       visible={isModalVisible}
       onCancel={handleCancel}
       footer={null}
+      bodyStyle={{
+        borderRadius: "12px",
+        padding: "16px",
+        maxHeight: "70vh",
+        overflowY: "auto",
+      }}
     >
       <Form
         form={form}

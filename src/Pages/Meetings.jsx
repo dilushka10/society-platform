@@ -74,6 +74,7 @@ function Meetings() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isPostponeModalVisible, setIsPostponeModalVisible] = useState(false);
   const [editingMeeting, setEditingMeeting] = useState(null);
   const [editForm] = Form.useForm();
 
@@ -100,9 +101,21 @@ function Meetings() {
     setIsEditModalVisible(true);
   };
 
+    // Show Modal for Postpone
+    const showPostponeModal = (meeting) => {
+      setEditingMeeting(meeting);
+      editForm.setFieldsValue({
+        date: meeting.date,
+        startTime: meeting.startTime,
+        endTime: meeting.endTime,
+      });
+      setIsPostponeModalVisible(true);
+    };
+
   // Hide Modal for Edit
   const handleEditCancel = () => {
     setIsEditModalVisible(false);
+    setIsPostponeModalVisible(false);
     editForm.resetFields();
     setEditingMeeting(null);
   };
@@ -208,7 +221,7 @@ function Meetings() {
           <Menu.Item
             key="postpone"
             icon={<ClockCircleOutlined />}
-            onClick={() => message.info("Postpone functionality coming soon!")}
+            onClick={() => showPostponeModal(meeting)}
           >
             Postpone
           </Menu.Item>
@@ -237,16 +250,13 @@ function Meetings() {
         </header>
 
         {/* Card Grid for All Screen Sizes */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4  p-4" >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4  p-4">
           {meetings.map((meeting) => (
             <Card
               key={meeting.id}
               title={`${meeting.name} (${meeting.id})`}
               extra={
-                <Dropdown
-                  overlay={actionMenu(meeting)}
-                  trigger={["click"]}
-                >
+                <Dropdown overlay={actionMenu(meeting)} trigger={["click"]}>
                   <Button shape="circle" icon={<EllipsisOutlined />} />
                 </Dropdown>
               }
@@ -299,10 +309,17 @@ function Meetings() {
 
         {/* Edit Meeting Modal */}
         <Modal
-          title="Update Meeting"
+        className="text-center"
+          title="Edit Meeting"
           visible={isEditModalVisible}
           onCancel={handleEditCancel}
           footer={null}
+          bodyStyle={{
+            borderRadius: "12px",
+            padding: "16px",
+            maxHeight: "70vh",
+            overflowY: "auto",
+          }}
         >
           <Form
             form={editForm}
@@ -333,30 +350,32 @@ function Meetings() {
               <Input placeholder="Enter Purpose" />
             </Form.Item>
 
-
             <Form.Item
               name="startTime"
               label="Start Time"
-              rules={[{ required: true, message: "Please enter the start time!" }]}
+              rules={[
+                { required: true, message: "Please enter the start time!" },
+              ]}
             >
               <Input type="time" />
             </Form.Item>
             <Form.Item
               name="endTime"
               label="End Time"
-              rules={[{  message: "Please enter the end time!" }]}
+              rules={[{ message: "Please enter the end time!" }]}
             >
               <Input type="time" />
             </Form.Item>
-
 
             <Form.Item
               name="notice"
               label="Notice"
               rules={[{ message: "Please Enter Notice!" }]}
             >
-              <Input.TextArea rows={4} placeholder="Enter any special notices" />
-              
+              <Input.TextArea
+                rows={4}
+                placeholder="Enter any special notices"
+              />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit" className="w-full">
@@ -373,6 +392,63 @@ function Meetings() {
           handleCreateMeeting={handleCreateMeeting}
           form={form}
         />
+
+        {/* Postpone Modal */}
+        <Modal
+        className="text-center"
+          title="Postpone Meeting"
+          visible={isPostponeModalVisible}
+          onCancel={handleEditCancel}
+          footer={null}
+          bodyStyle={{
+            borderRadius: "12px",
+            padding: "16px",
+            maxHeight: "70vh",
+            overflowY: "auto",
+          }}
+        >
+          <Form
+            form={editForm}
+            layout="vertical"
+            onFinish={handleUpdateMeeting}
+          >
+            <Form.Item
+              name="date"
+              label="Date"
+              rules={[{ required: true, message: "Please select the date!" }]}
+            >
+              <Input type="date" />
+            </Form.Item>
+
+          
+
+         
+
+            <Form.Item
+              name="startTime"
+              label="Start Time"
+              rules={[
+                { required: true, message: "Please enter the start time!" },
+              ]}
+            >
+              <Input type="time" />
+            </Form.Item>
+            <Form.Item
+              name="endTime"
+              label="End Time"
+              rules={[{ message: "Please enter the end time!" }]}
+            >
+              <Input type="time" />
+            </Form.Item>
+
+           
+            <Form.Item>
+              <Button type="primary" htmlType="submit" className="w-full">
+                Update
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
       </div>
     </div>
   );

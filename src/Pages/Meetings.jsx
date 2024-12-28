@@ -22,6 +22,7 @@ import {
 } from "@ant-design/icons";
 import Navbar from "../Components/Navbar";
 import CreateMeetingModel from "../Components/CreateMeetingModel";
+import MeetingCard from "../Components/Meetings/MeetingCard";
 
 function Meetings() {
   const [meetings, setMeetings] = useState([
@@ -144,6 +145,15 @@ function Meetings() {
     handleEditCancel();
   };
 
+  // Handle Start Meeting
+  const handleStartMeeting = (id) => {
+    const updatedMeetings = meetings.map((meeting) =>
+      meeting.id === id? {...meeting, status: "Started" } : meeting
+    );
+    setMeetings(updatedMeetings);
+    message.success("Meeting started successfully!");
+  };
+
   // Delete a Meeting
   const handleDeleteMeeting = (id) => {
     setMeetings(meetings.filter((meeting) => meeting.id !== id));
@@ -252,58 +262,61 @@ function Meetings() {
         {/* Card Grid for All Screen Sizes */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4  p-4">
           {meetings.map((meeting) => (
-            <Card
-              key={meeting.id}
-              title={`${meeting.name} (${meeting.id})`}
-              extra={
-                <Dropdown overlay={actionMenu(meeting)} trigger={["click"]}>
-                  <Button shape="circle" icon={<EllipsisOutlined />} />
-                </Dropdown>
-              }
-              className="shadow-md border border-gray-200  "
-            >
-              <p>
-                <strong>Date:</strong> {meeting.date}
-              </p>
-              <p>
-                <strong>Purpose:</strong> {meeting.purpose}
-              </p>
-              <p>
-                <strong>Start Time:</strong> {meeting.startTime}
-              </p>
-              <p>
-                <strong>End Time:</strong> {meeting.endTime}
-              </p>
-              <p>
-                <strong>Notice:</strong> {meeting.notice}
-              </p>
-              {["Ended", "Started"].includes(meeting.status) && (
-                <>
-                  <p>
-                    <strong>Participants:</strong> {meeting.participants}
-                  </p>
-                  <p>
-                    <strong>Absents:</strong> {meeting.absents}
-                  </p>
-                </>
-              )}
-              <p>
-                <strong>Status:</strong>{" "}
-                <span
-                  className={`font-semibold ${
-                    meeting.status === "Pending"
-                      ? "text-blue-500"
-                      : meeting.status === "Ended"
-                      ? "text-gray-500"
-                      : meeting.status === "Started"
-                      ? "text-green-500"
-                      : "text-yellow-500"
-                  }`}
-                >
-                  {meeting.status}
-                </span>
-              </p>
-            </Card>
+            <MeetingCard key={meeting.id} meeting={meeting} onEdit={showEditModal} onDelete={handleDeleteMeeting} onStartMeeting={handleStartMeeting} onPostpone={showPostponeModal}/>
+
+
+            // <Card
+            //   key={meeting.id}
+            //   title={`${meeting.name} (${meeting.id})`}
+            //   extra={
+            //     <Dropdown overlay={actionMenu(meeting)} trigger={["click"]}>
+            //       <Button shape="circle" icon={<EllipsisOutlined />} />
+            //     </Dropdown>
+            //   }
+            //   className="shadow-md border border-gray-200  "
+            // >
+            //   <p>
+            //     <strong>Date:</strong> {meeting.date}
+            //   </p>
+            //   <p>
+            //     <strong>Purpose:</strong> {meeting.purpose}
+            //   </p>
+            //   <p>
+            //     <strong>Start Time:</strong> {meeting.startTime}
+            //   </p>
+            //   <p>
+            //     <strong>End Time:</strong> {meeting.endTime}
+            //   </p>
+            //   <p>
+            //     <strong>Notice:</strong> {meeting.notice}
+            //   </p>
+            //   {["Ended", "Started"].includes(meeting.status) && (
+            //     <>
+            //       <p>
+            //         <strong>Participants:</strong> {meeting.participants}
+            //       </p>
+            //       <p>
+            //         <strong>Absents:</strong> {meeting.absents}
+            //       </p>
+            //     </>
+            //   )}
+            //   <p>
+            //     <strong>Status:</strong>{" "}
+            //     <span
+            //       className={`font-semibold ${
+            //         meeting.status === "Pending"
+            //           ? "text-blue-500"
+            //           : meeting.status === "Ended"
+            //           ? "text-gray-500"
+            //           : meeting.status === "Started"
+            //           ? "text-green-500"
+            //           : "text-yellow-500"
+            //       }`}
+            //     >
+            //       {meeting.status}
+            //     </span>
+            //   </p>
+            // </Card>
           ))}
         </div>
 

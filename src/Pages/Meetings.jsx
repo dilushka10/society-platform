@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Button,
-  Modal,
-  Input,
-  Form,
-  Card,
   Dropdown,
   Menu,
   message,
-  Table,
+  Card,
+  Form,
+  Modal,
+  Input,
 } from "antd";
 import {
   PlusOutlined,
   EllipsisOutlined,
   EditOutlined,
   DeleteOutlined,
+  PlayCircleOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  StopOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import Navbar from "../Components/Navbar";
 import CreateMeetingModel from "../Components/CreateMeetingModel";
@@ -29,7 +33,7 @@ function Meetings() {
       startTime: "10:00 AM",
       endTime: "12:00 PM",
       notice: "Please bring your ID card",
-      status: "Active",
+      status: "Pending",
     },
     {
       id: "C002",
@@ -39,21 +43,39 @@ function Meetings() {
       startTime: "2:00 PM",
       endTime: "4:00 PM",
       notice: "Team leads must attend",
-      status: "Scheduled",
+      status: "Today",
+    },
+    {
+      id: "C003",
+      date: "2024-12-28",
+      name: "Marketing Campaign",
+      purpose: "Discuss new marketing campaign",
+      startTime: "11:00 AM",
+      endTime: "1:00 PM",
+      notice: "Bring your laptops",
+      status: "Started",
+      participants: 20,
+      absents: 3,
+    },
+    {
+      id: "C004",
+      date: "2024-12-29",
+      name: "Product Launch",
+      purpose: "Plan for upcoming product launch",
+      startTime: "3:00 PM",
+      endTime: "5:00 PM",
+      notice: "Prepare presentation",
+      status: "Ended",
+      participants: 15,
+      absents: 5,
     },
   ]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detect screen size for responsive design
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingMeeting, setEditingMeeting] = useState(null);
+  const [editForm] = Form.useForm();
 
   // Show Modal
   const showModal = () => setIsModalVisible(true);
@@ -64,17 +86,49 @@ function Meetings() {
     form.resetFields();
   };
 
+  // Show Modal for Edit
+  const showEditModal = (meeting) => {
+    setEditingMeeting(meeting);
+    editForm.setFieldsValue({
+      date: meeting.date,
+      name: meeting.name,
+      purpose: meeting.purpose,
+      notice: meeting.notice,
+      startTime: meeting.startTime,
+      endTime: meeting.endTime,
+    });
+    setIsEditModalVisible(true);
+  };
+
+  // Hide Modal for Edit
+  const handleEditCancel = () => {
+    setIsEditModalVisible(false);
+    editForm.resetFields();
+    setEditingMeeting(null);
+  };
+
   // Handle New Meeting Creation
   const handleCreateMeeting = (values) => {
     const newMeeting = {
       id: `C${String(meetings.length + 1).padStart(3, "0")}`,
       ...values,
-      status: "Active", // Default status for new meetings
+      status: "Pending",
     };
     setMeetings([...meetings, newMeeting]);
     message.success("Meeting created successfully!");
     setIsModalVisible(false);
     form.resetFields();
+  };
+
+  // Handle Update Meeting
+  const handleUpdateMeeting = (values) => {
+    setMeetings((prevMeetings) =>
+      prevMeetings.map((meeting) =>
+        meeting.id === editingMeeting.id ? { ...meeting, ...values } : meeting
+      )
+    );
+    message.success("Meeting updated successfully!");
+    handleEditCancel();
   };
 
   // Delete a Meeting
@@ -83,97 +137,94 @@ function Meetings() {
     message.success("Meeting deleted successfully!");
   };
 
-  // Action Menu for Edit/Delete
-  const actionMenu = (id) => (
-    <Menu>
-      <Menu.Item
-        key="edit"
-        icon={<EditOutlined />}
-        onClick={() => message.info("Edit functionality coming soon!")}
-      >
-        Edit
-      </Menu.Item>
-      <Menu.Item
-        key="delete"
-        icon={<DeleteOutlined />}
-        danger
-        onClick={() => handleDeleteMeeting(id)}
-      >
-        Delete
-      </Menu.Item>
-    </Menu>
-  );
-
-  // Table Columns for Desktop View
-  const columns = [
-    {
-      title: "Meeting ID",
-      dataIndex: "id",
-      key: "id",
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Purpose",
-      dataIndex: "purpose",
-      key: "purpose",
-    },
-    {
-      title: "Start Time",
-      dataIndex: "startTime",
-      key: "startTime",
-    },
-    {
-      title: "End Time",
-      dataIndex: "endTime",
-      key: "endTime",
-    },
-    {
-      title: "Notice",
-      dataIndex: "notice",
-      key: "notice",
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => (
-        <span
-          className={`font-semibold ${
-            status === "Active" ? "text-green-500" : "text-yellow-500"
-          }`}
-        >
-          {status}
-        </span>
-      ),
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Dropdown overlay={actionMenu(record.id)} trigger={["click"]}>
-          <Button shape="circle" icon={<EllipsisOutlined />} />
-        </Dropdown>
-      ),
-    },
-  ];
+  // Action Menu for Different Statuses
+  const actionMenu = (meeting) => {
+    const { id, status } = meeting;
+    if (status === "Pending") {
+      return (
+        <Menu>
+          <Menu.Item
+            key="edit"
+            icon={<EditOutlined />}
+            onClick={() => showEditModal(meeting)}
+          >
+            Edit
+          </Menu.Item>
+          <Menu.Item
+            key="delete"
+            icon={<DeleteOutlined />}
+            danger
+            onClick={() => handleDeleteMeeting(id)}
+          >
+            Delete
+          </Menu.Item>
+        </Menu>
+      );
+    } else if (status === "Ended") {
+      return (
+        <Menu>
+          <Menu.Item
+            key="view"
+            icon={<EyeOutlined />}
+            onClick={() => message.info("View functionality coming soon!")}
+          >
+            View
+          </Menu.Item>
+        </Menu>
+      );
+    } else if (status === "Started") {
+      return (
+        <Menu>
+          <Menu.Item
+            key="markAttendance"
+            icon={<CheckCircleOutlined />}
+            onClick={() =>
+              message.info("Mark Attendance functionality coming soon!")
+            }
+          >
+            Mark Attendance
+          </Menu.Item>
+          <Menu.Item
+            key="endMeeting"
+            icon={<StopOutlined />}
+            onClick={() =>
+              message.info("End Meeting functionality coming soon!")
+            }
+          >
+            End Meeting
+          </Menu.Item>
+        </Menu>
+      );
+    } else if (status === "Today") {
+      return (
+        <Menu>
+          <Menu.Item
+            key="startMeeting"
+            icon={<PlayCircleOutlined />}
+            onClick={() => message.info("Start functionality coming soon!")}
+          >
+            Start Meeting
+          </Menu.Item>
+          <Menu.Item
+            key="postpone"
+            icon={<ClockCircleOutlined />}
+            onClick={() => message.info("Postpone functionality coming soon!")}
+          >
+            Postpone
+          </Menu.Item>
+        </Menu>
+      );
+    }
+  };
 
   return (
     <div className="flex h-screen bg-[#F5F9FF] font-custom">
       <Navbar />
-      <div className="flex flex-col flex-grow">
+      <div className="flex-grow p-4">
         {/* Header */}
-        <header className="bg-white shadow py-4 px-8 border-b border-gray-200">
+        <header className="bg-white shadow p-4 rounded-lg mb-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-xl text-gray-800">Meetings</h1>
+            <h1 className="text-2xl font-bold text-gray-800">Meetings</h1>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -185,76 +236,143 @@ function Meetings() {
           </div>
         </header>
 
-        {/* Content */}
-        <div className="px-8 pt-8">
-          {/* Desktop Table View */}
-          {!isMobile && (
-            <Table
-              columns={columns}
-              dataSource={meetings}
-              rowKey="id"
-              bordered
-              pagination={{ pageSize: 5 }}
-            />
-          )}
-
-          {/* Mobile Card View */}
-          {isMobile && (
-            <div className="space-y-4">
-              {meetings.map((meeting) => (
-                <Card
-                  key={meeting.id}
-                  title={`${meeting.name} (${meeting.id})`}
-                  extra={
-                    <Dropdown
-                      overlay={actionMenu(meeting.id)}
-                      trigger={["click"]}
-                    >
-                      <Button shape="circle" icon={<EllipsisOutlined />} />
-                    </Dropdown>
-                  }
-                  className="shadow-md border border-gray-200"
+        {/* Card Grid for All Screen Sizes */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4  p-4" >
+          {meetings.map((meeting) => (
+            <Card
+              key={meeting.id}
+              title={`${meeting.name} (${meeting.id})`}
+              extra={
+                <Dropdown
+                  overlay={actionMenu(meeting)}
+                  trigger={["click"]}
                 >
+                  <Button shape="circle" icon={<EllipsisOutlined />} />
+                </Dropdown>
+              }
+              className="shadow-md border border-gray-200  "
+            >
+              <p>
+                <strong>Date:</strong> {meeting.date}
+              </p>
+              <p>
+                <strong>Purpose:</strong> {meeting.purpose}
+              </p>
+              <p>
+                <strong>Start Time:</strong> {meeting.startTime}
+              </p>
+              <p>
+                <strong>End Time:</strong> {meeting.endTime}
+              </p>
+              <p>
+                <strong>Notice:</strong> {meeting.notice}
+              </p>
+              {["Ended", "Started"].includes(meeting.status) && (
+                <>
                   <p>
-                    <strong>Date:</strong> {meeting.date}
+                    <strong>Participants:</strong> {meeting.participants}
                   </p>
                   <p>
-                    <strong>Purpose:</strong> {meeting.purpose}
+                    <strong>Absents:</strong> {meeting.absents}
                   </p>
-                  <p>
-                    <strong>Start Time:</strong> {meeting.startTime}
-                  </p>
-                  <p>
-                    <strong>End Time:</strong> {meeting.endTime}
-                  </p>
-                  <p>
-                    <strong>Notice:</strong> {meeting.notice}
-                  </p>
-                  <p>
-                    <strong>Status:</strong>{" "}
-                    <span
-                      className={`font-semibold ${
-                        meeting.status === "Active"
-                          ? "text-green-500"
-                          : "text-yellow-500"
-                      }`}
-                    >
-                      {meeting.status}
-                    </span>
-                  </p>
-                </Card>
-              ))}
-            </div>
-          )}
-
-          {/* Create Meeting Modal */}
-          <CreateMeetingModel
-            isModalVisible={isModalVisible}
-            handleCancel={handleCancel}
-            handleCreateMeeting={handleCreateMeeting}
-            form={form}
-          />
+                </>
+              )}
+              <p>
+                <strong>Status:</strong>{" "}
+                <span
+                  className={`font-semibold ${
+                    meeting.status === "Pending"
+                      ? "text-blue-500"
+                      : meeting.status === "Ended"
+                      ? "text-gray-500"
+                      : meeting.status === "Started"
+                      ? "text-green-500"
+                      : "text-yellow-500"
+                  }`}
+                >
+                  {meeting.status}
+                </span>
+              </p>
+            </Card>
+          ))}
         </div>
+
+        {/* Edit Meeting Modal */}
+        <Modal
+          title="Update Meeting"
+          visible={isEditModalVisible}
+          onCancel={handleEditCancel}
+          footer={null}
+        >
+          <Form
+            form={editForm}
+            layout="vertical"
+            onFinish={handleUpdateMeeting}
+          >
+            <Form.Item
+              name="date"
+              label="Date"
+              rules={[{ required: true, message: "Please select the date!" }]}
+            >
+              <Input type="date" />
+            </Form.Item>
+
+            <Form.Item
+              name="name"
+              label="Meeting Name"
+              rules={[{ required: true, message: "Please select the date!" }]}
+            >
+              <Input placeholder="Enter Meeting Name" />
+            </Form.Item>
+
+            <Form.Item
+              name="purpose"
+              label="Purpose"
+              rules={[{ required: true, message: "Please select the date!" }]}
+            >
+              <Input placeholder="Enter Purpose" />
+            </Form.Item>
+
+
+            <Form.Item
+              name="startTime"
+              label="Start Time"
+              rules={[{ required: true, message: "Please enter the start time!" }]}
+            >
+              <Input type="time" />
+            </Form.Item>
+            <Form.Item
+              name="endTime"
+              label="End Time"
+              rules={[{  message: "Please enter the end time!" }]}
+            >
+              <Input type="time" />
+            </Form.Item>
+
+
+            <Form.Item
+              name="notice"
+              label="Notice"
+              rules={[{ message: "Please Enter Notice!" }]}
+            >
+              <Input.TextArea rows={4} placeholder="Enter any special notices" />
+              
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" className="w-full">
+                Update
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
+
+        {/* Create Meeting Modal */}
+        <CreateMeetingModel
+          isModalVisible={isModalVisible}
+          handleCancel={handleCancel}
+          handleCreateMeeting={handleCreateMeeting}
+          form={form}
+        />
       </div>
     </div>
   );

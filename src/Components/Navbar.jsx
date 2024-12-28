@@ -22,7 +22,7 @@ const Navbar = () => {
   const menuItems = [
     { label: "Home", icon: <HomeOutlined />, link: "/" },
     { label: "Members", icon: <UserOutlined />, link: "/members" },
-    { label: "Meetings", icon: <FormOutlined />, link: "/meetings" },
+    { label: "Conference", icon: <FormOutlined />, link: "/meetings" },
     { label: "Payment", icon: <MoneyCollectOutlined />, link: "/payment" },
     { label: "Logout", icon: <LogoutOutlined />, link: "/logout" },
   ];
@@ -32,7 +32,7 @@ const Navbar = () => {
       {/* Desktop Sidebar */}
       <aside
         className={`hidden md:flex ${
-          collapsed ? "w-16" : "w-64"
+          collapsed ? "w-16" : "w-52"
         } bg-[#0D47A1] text-white flex-col justify-between h-screen transition-all duration-300 font-custom`}
       >
         {/* Top Section */}

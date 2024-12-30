@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { Modal } from 'antd';
 import { QrReader } from 'react-qr-reader';
 import { Calendar, Clock, Users, AlertCircle, Edit, Trash2, Play, PauseCircle, CheckCircle, Eye } from 'lucide-react';
-import QRCodeScanner from './QRCodeScanner';
 
 const StatusBadge = ({ status }) => {
     const getStatusColor = (status) => {
@@ -38,11 +37,7 @@ const MeetingCard = ({ meeting, onEdit, onDelete, onStartMeeting, onPostpone, on
 
     const handleModalClose = () => {
         setIsModalVisible(false);
-        // Stop the camera if it's active
-        if (videoRef.current && videoRef.current.srcObject) {
-            const tracks = videoRef.current.srcObject.getTracks();
-            tracks.forEach((track) => track.stop());
-        }
+        window.location.reload();
     };
 
     const renderActions = (status) => {
@@ -77,6 +72,9 @@ const MeetingCard = ({ meeting, onEdit, onDelete, onStartMeeting, onPostpone, on
                         </button>
                         <button onClick={() => onEndMeeting(meeting.id)} className="bg-gray-500 text-white px-3 py-2 rounded hover:bg-gray-600">
                             <CheckCircle className="w-4 h-4 inline mr-1" /> End Meeting
+                        </button>
+                        <button onClick={() => onView(meeting.id)} className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600">
+                            <Eye className="w-4 h-4 inline mr-1" /> View
                         </button>
                     </div>
                 );
@@ -140,23 +138,24 @@ const MeetingCard = ({ meeting, onEdit, onDelete, onStartMeeting, onPostpone, on
                 footer={null}
             >
                 {isModalVisible && (
-                    // <QrReader
-                    //     constraints={{ facingMode: 'environment' }}
-                    //     ref={videoRef}
-                    //     onResult={(result, error) => {
-                    //         if (result) {
-                    //             alert(`Scanned result: ${result.text}`);
-                    //             handleModalClose();
-                    //         }
-                    //         // if (error) {
-                    //         //     console.error(error);
-                    //         // }
-                    //     }}
-                    //     style={{ width: '100%' }}
-                    // />
-                    <QRCodeScanner />
+                    <QrReader
+                        constraints={{ facingMode: 'environment' }}
+                        ref={videoRef}
+                        onResult={(result, error) => {
+                            if (result) {
+                                alert(`Scanned result: ${result.text}`);
+                                handleModalClose();
+                            }
+                            if (error) {
+                                console.error(error);
+                            }
+                        }}
+                        style={{ width: '100%' }}
+                    />
+                    
                 )}
             </Modal>
+
         </div>
     );
 };

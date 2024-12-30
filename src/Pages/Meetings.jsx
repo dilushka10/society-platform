@@ -102,16 +102,16 @@ function Meetings() {
     setIsEditModalVisible(true);
   };
 
-    // Show Modal for Postpone
-    const showPostponeModal = (meeting) => {
-      setEditingMeeting(meeting);
-      editForm.setFieldsValue({
-        date: meeting.date,
-        startTime: meeting.startTime,
-        endTime: meeting.endTime,
-      });
-      setIsPostponeModalVisible(true);
-    };
+  // Show Modal for Postpone
+  const showPostponeModal = (meeting) => {
+    setEditingMeeting(meeting);
+    editForm.setFieldsValue({
+      date: meeting.date,
+      startTime: meeting.startTime,
+      endTime: meeting.endTime,
+    });
+    setIsPostponeModalVisible(true);
+  };
 
   // Hide Modal for Edit
   const handleEditCancel = () => {
@@ -148,7 +148,7 @@ function Meetings() {
   // Handle Start Meeting
   const handleStartMeeting = (id) => {
     const updatedMeetings = meetings.map((meeting) =>
-      meeting.id === id? {...meeting, status: "Started" } : meeting
+      meeting.id === id ? { ...meeting, status: "Started" } : meeting
     );
     setMeetings(updatedMeetings);
     message.success("Meeting started successfully!");
@@ -243,86 +243,44 @@ function Meetings() {
   return (
     <div className="flex h-screen bg-[#F5F9FF] font-custom">
       <Navbar />
-      <div className="flex-grow p-4">
+      <div className="flex-grow ">
         {/* Header */}
-        <header className="bg-white shadow p-4 rounded-lg mb-6">
+        <header className="bg-white shadow py-4 px-8 border-b border-gray-200">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-800">Meetings</h1>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={showModal}
-              className="bg-[#0D47A1] hover:bg-[#1565C0] border-none text-white"
-            >
-              Create New Meeting
-            </Button>
+            <h1 className="text-xl text-gray-800">Meetings Management</h1>
           </div>
         </header>
+
+        <div className="flex-grow px-4 pt-8 bg-red">
+          <div className="bg-white shadow rounded-lg p-6 border border-gray-200">
+            <div className="flex justify-between items-center">
+              <Input.Search
+                placeholder="Search Meetings"
+                style={{ width: "300px" }}
+              />
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={showModal}
+                className="bg-[#0D47A1] hover:bg-[#1565C0] border-none text-white"
+              >
+                Create New Meeting
+              </Button>
+            </div>
+          </div>
+        </div>
 
         {/* Card Grid for All Screen Sizes */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4  p-4">
           {meetings.map((meeting) => (
-            <MeetingCard key={meeting.id} meeting={meeting} onEdit={showEditModal} onDelete={handleDeleteMeeting} onStartMeeting={handleStartMeeting} onPostpone={showPostponeModal}/>
+            <MeetingCard key={meeting.id} meeting={meeting} onEdit={showEditModal} onDelete={handleDeleteMeeting} onStartMeeting={handleStartMeeting} onPostpone={showPostponeModal} />
 
-
-            // <Card
-            //   key={meeting.id}
-            //   title={`${meeting.name} (${meeting.id})`}
-            //   extra={
-            //     <Dropdown overlay={actionMenu(meeting)} trigger={["click"]}>
-            //       <Button shape="circle" icon={<EllipsisOutlined />} />
-            //     </Dropdown>
-            //   }
-            //   className="shadow-md border border-gray-200  "
-            // >
-            //   <p>
-            //     <strong>Date:</strong> {meeting.date}
-            //   </p>
-            //   <p>
-            //     <strong>Purpose:</strong> {meeting.purpose}
-            //   </p>
-            //   <p>
-            //     <strong>Start Time:</strong> {meeting.startTime}
-            //   </p>
-            //   <p>
-            //     <strong>End Time:</strong> {meeting.endTime}
-            //   </p>
-            //   <p>
-            //     <strong>Notice:</strong> {meeting.notice}
-            //   </p>
-            //   {["Ended", "Started"].includes(meeting.status) && (
-            //     <>
-            //       <p>
-            //         <strong>Participants:</strong> {meeting.participants}
-            //       </p>
-            //       <p>
-            //         <strong>Absents:</strong> {meeting.absents}
-            //       </p>
-            //     </>
-            //   )}
-            //   <p>
-            //     <strong>Status:</strong>{" "}
-            //     <span
-            //       className={`font-semibold ${
-            //         meeting.status === "Pending"
-            //           ? "text-blue-500"
-            //           : meeting.status === "Ended"
-            //           ? "text-gray-500"
-            //           : meeting.status === "Started"
-            //           ? "text-green-500"
-            //           : "text-yellow-500"
-            //       }`}
-            //     >
-            //       {meeting.status}
-            //     </span>
-            //   </p>
-            // </Card>
           ))}
         </div>
 
         {/* Edit Meeting Modal */}
         <Modal
-        className="text-center"
+          className="text-center"
           title="Edit Meeting"
           visible={isEditModalVisible}
           onCancel={handleEditCancel}
@@ -408,7 +366,7 @@ function Meetings() {
 
         {/* Postpone Modal */}
         <Modal
-        className="text-center"
+          className="text-center"
           title="Postpone Meeting"
           visible={isPostponeModalVisible}
           onCancel={handleEditCancel}
@@ -433,9 +391,9 @@ function Meetings() {
               <Input type="date" />
             </Form.Item>
 
-          
 
-         
+
+
 
             <Form.Item
               name="startTime"
@@ -454,7 +412,7 @@ function Meetings() {
               <Input type="time" />
             </Form.Item>
 
-           
+
             <Form.Item>
               <Button type="primary" htmlType="submit" className="w-full">
                 Update

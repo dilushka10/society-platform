@@ -233,11 +233,11 @@ function Meetings() {
   return (
     <div className="flex h-screen bg-[#F5F9FF] font-custom">
       <Navbar />
-      <div className="flex-grow p-4">
+      <div className="flex-grow ">
         {/* Header */}
-        <header className="bg-white shadow p-4 rounded-lg mb-6">
+        <header className="bg-white shadow p-4  mb-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-800">Meetings</h1>
+            <h1 className="text-xl  text-black">Meetings</h1>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -249,8 +249,10 @@ function Meetings() {
           </div>
         </header>
 
+        
+
         {/* Card Grid for All Screen Sizes */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4  p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-8">
           {meetings.map((meeting) => (
             <Card
               key={meeting.id}

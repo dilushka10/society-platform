@@ -13,19 +13,20 @@ import RegisterMemberModal from "../Components/RegisterMemberModal";
 import * as htmlToImage from "html-to-image";
 import image from "../assets/qr.png";
 import EditMemberModel from "../Components/EditMemberModel";
+import Cardbg from "../assets/cardbg.png";
 
 const Members = () => {
   const data = [
     {
       key: "1",
-      membershipNo: "005451",
+      membershipNo: "SRC0012/23/123",
       date: "2024-12-26",
-      name: "John Doe1",
-      society: "Kaluthara1",
+      name: "T.W.M. Janith Wijethunga",
+      society: "Kaluthara1 dead Society",
       societyregistrationnumber: "SRN00251",
       address: "123 Main St, Colombo1",
-      nic: "982374567V1",
-      phonenumber: "0775555551",
+      nic: "982374567V",
+      phonenumber: "0775458951",
     },
     {
       key: "2",
@@ -326,8 +327,16 @@ const Members = () => {
     <div className="flex h-screen bg-[#F5F9FF] font-custom">
       <Navbar />
       <div className="flex flex-col flex-grow">
-        <header className="bg-white shadow py-4 px-8 border-b border-gray-200">
+        <header className="bg-white shadow py-4 px-8 border-b border-gray-200 flex  justify-between items-center">
           <h1 className="text-xl text-gray-800">Members Management</h1>
+          <Button
+            type="primary"
+            onClick={showModal}
+            icon={<PlusOutlined />}
+            className="bg-[#0D47A1] hover:bg-[#1565C0] border-none text-white"
+          >
+            Register New Member
+          </Button>
         </header>
         <div className="flex-grow px-8 pt-8 ">
           <div className="bg-white shadow rounded-lg p-6 border border-gray-200">
@@ -335,14 +344,6 @@ const Members = () => {
               <h2 className="text-lg font-medium text-gray-700">
                 Members List
               </h2>
-              <Button
-                type="primary"
-                onClick={showModal}
-                icon={<PlusOutlined />}
-                className="bg-[#0D47A1] hover:bg-[#1565C0] border-none text-white"
-              >
-                Register New Member
-              </Button>
             </div>
             <div className="flex flex-row">
               <Input
@@ -433,68 +434,70 @@ const Members = () => {
         onCancel={closeModal}
         footer={null}
         centered
+       
       >
         {selectedRecord && (
           <div
             ref={cardRef}
-            className="relative w-64 h-96 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-lg shadow-xl border border-purple-500 p-4 mx-auto flex flex-col items-center overflow-hidden"
+            className="relative w-80 bg-white shadow-xl rounded-lg mx-auto p-6 overflow-hidden flex flex-col items-center"
           >
-            <div className="relative w-full h-screen bg-gray-900">
-              {/* Background Layer */}
-              <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900"></div>
+            {/* Background Layer */}
+            <div className="absolute inset-0 w-full h-full">
+              <img
+                src={Cardbg}
+                alt="Card Background"
+                className="w-full h-full object-fill rounded-lg "
+              />
             </div>
 
             {/* Header */}
-            <div className="relative text-xl font-bold uppercase mb-2 mt-5 tracking-wide text-center z-10">
+            <div className="relative text-3xl font-bold uppercase text-center mt-4 tracking-widest text-white z-10">
               {selectedRecord.name}
             </div>
 
             {/* Sub-header */}
-            <div className="relative text-sm italic mb-4 z-10">
+            <div className="relative text-sm italic text-white mb-6 text-center z-10">
               Member of {selectedRecord.society}
             </div>
 
-            {/* Body */}
-            <div className="relative flex flex-col items-center z-10">
-              {/* QR Code */}
-              <div className="w-32 h-32 border-2 border-white rounded-md p-2 mt-4 mb-6 bg-white">
-                <img
-                  src={image} 
-                  alt="QR Code"
-                  className="w-full h-full object-contain"
-                />
-              </div>
+            {/* QR Code */}
+            <div className="relative w-40 h-40 border-4 border-gray-200 rounded-lg p-2 mb-6 bg-white shadow-lg z-10">
+              <img
+                src={image}
+                alt="QR Code"
+                className="w-full h-full object-contain"
+              />
+            </div>
 
-              {/* Details */}
-              <div className="text-center text-sm">
-                <p className="font-semibold text-yellow-300 mb-1">
-                  Socissety: {selectedRecord.society}
-                </p>
-                <p className="text-gray-100 mb-1">
-                  Reg. No: {selectedRecord.societyregistrationnumber}
-                </p>
-                <p className="text-gray-100 mb-1">
-                  Membership No: {selectedRecord.membershipNo}
-                </p>
-                <p className="text-gray-100">
-                  Phone: {selectedRecord.phonenumber}
-                </p>
-              </div>
+            {/* Details */}
+            <div className="relative text-center text-base z-10 space-y-3">
+              <p className="text-black">
+                <span className="font-semibold">Reg. No:</span>{" "}
+                {selectedRecord.societyregistrationnumber}
+              </p>
+              <p className="text-black">
+                <span className="font-semibold">Membership No:</span>{" "}
+                {selectedRecord.membershipNo}
+              </p>
+              <p className="text-black">
+                <span className="font-semibold">Phone:</span>{" "}
+                {selectedRecord.phonenumber}
+              </p>
             </div>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex justify-between mt-4">
+        <div className="flex  mt-6 space-x-4">
           <Button
             onClick={handleDownloadPDF}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg"
           >
             Download PDF
           </Button>
           <Button
             onClick={handleShare}
-            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+            className="flex-1 bg-blue-800 hover:bg-blue-700 text-white font-bold  rounded-lg"
           >
             Share
           </Button>
